@@ -96,5 +96,5 @@ class UserProfile(APIView):
     def post(self,request):
         pass
 
-    def get(self,request);
+    def get(self,request):
         pass
