@@ -21,10 +21,8 @@ class UserResgistration(APIView):
     permission_classes = []
 
     def post(self,request:Request):
-        
         user_data           = request.data
         serializer          = RegistrationSerializer(data = user_data)
-
         if serializer.is_valid():
             serializer.save()
             context = "Your account is created successfully, Please login to continue."
@@ -82,3 +80,21 @@ class UserLogout(APIView):
             return Response({"msg": "Logged out "},status=status.HTTP_200_OK)
         except:
             return Response({"Already logged out or Server Error"},status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfile(APIView):
+
+    """
+        Users can create PROFILE to their choices. This will be  must in future 
+        for users to maintain a profile.
+        Class Allows : To create profile & View Profile.
+    """
+
+    authentication_classes  = (JWTAuthentication,)
+    permission_classes      = (IsAuthenticated,)
+
+    def post(self,request):
+        pass
+
+    def get(self,request);
+        pass
