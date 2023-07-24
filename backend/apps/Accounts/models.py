@@ -3,8 +3,8 @@ from django.contrib.auth.base_user import AbstractBaseUser,BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from datetime import date
 from django.utils.translation import gettext_lazy as _
-
-from .constants import DISTRICT_CHOICES
+from django.conf import settings
+from .constants import DISTRICT_CHOICES,GAME_CHOICE
 
 class UserManager(BaseUserManager):
     
@@ -54,11 +54,9 @@ class Users(AbstractBaseUser,PermissionsMixin):
     country         = models.CharField(_('user country'), max_length=250, blank=True)
     created_on      = models.DateTimeField(_('user created on'), auto_now_add=True)
     updated_on      = models.DateTimeField(_('user updated on'), auto_now=True)
+    date_of_birth   = models.DateField("Date in ( MM/DD/YYYY )",null= True,blank=False,auto_now=False,auto_now_add=False)
 
     objects = UserManager()
-    
-    
-    
 
     USERNAME_FIELD      = 'email'
     REQUIRED_FIELDS     = ['username']
@@ -84,8 +82,42 @@ class Users(AbstractBaseUser,PermissionsMixin):
         Returns the short name for the user.
         '''
         return self.first_name
+    
+    def age(self):
+
+        '''
+        Returns the age of the user
+        '''
+        
+        today  = date.today() 
+        try:
+            birthday = self.DOB.replace(year=today.year)
+        except ValueError:
+            birthday = self.DOB.replace(year=today.year,day=self.DOB.day-1)
+    
+        if birthday > today:
+            return today.year - self.date_of_birth.year - 1
+        else :
+            return today.year -self.date_of_birth.year
     class Meta:
         verbose_name_plural = "Users"
     
+
+class UserProfile(models.Model):
+
+    """Contains the profile information for every user."""
+    
+    user            = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    games           = models.CharField(choices=GAME_CHOICE,max_length= 10,default='All')
+    profile_active  = models.BooleanField(default=True)
+    updated_on      = models.DateTimeField(auto_now=True)
+    # team            = models.ForeignKey(Teams,on_delete=models.CASCADE)
+
+
+    def __str__(self):
+        return self.user
+
+    class Meta:
+        verbose_name_plural ="Profiles"
 
 

@@ -14,3 +14,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user            = Users.objects.create_user(**validated_data)
         Token.objects.create(user=user)
         return user
+    
+class ProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model           = UserProfile
+        fields          = "__all__"

@@ -73,28 +73,98 @@ class UserLogout(APIView):
                 token: OutstandingToken
                 for token in OutstandingToken.objects.filter(user=request.user):
                     _, _ = BlacklistedToken.objects.get_or_create(token=token)
-                return Response({"status": "all refresh tokens blacklisted"})
+                return Response({"status": "all refresh tokens blacklisted"},status.HTTP_400_BAD_REQUEST)
             refresh_token = self.request.data.get('refresh')
             token = RefreshToken(token=refresh_token)
             token.blacklist()
             return Response({"msg": "Logged out "},status=status.HTTP_200_OK)
         except:
-            return Response({"Already logged out or Server Error"},status=status.HTTP_400_BAD_REQUEST)
+            return Response({"msg":"Already logged out or Server Error"},status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserProfile(APIView):
+class UserProfileViewSet(APIView):
 
     """
         Users can create PROFILE to their choices. This will be  must in future 
         for users to maintain a profile.
-        Class Allows : To create profile & View Profile.
+        Class Allows : To create profile & View Profile $ Update
     """
 
     authentication_classes  = (JWTAuthentication,)
     permission_classes      = (IsAuthenticated,)
 
     def post(self,request):
-        pass
+        try:
+            user = UserProfile.objects.filter(user=request.user_id,profile_active=False)
+            if user:
+                profile_data = request.data
+                serializer = ProfileSerializer(data = profile_data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({"msg": "Profile Created"},status=status.HTTP_200_OK)
+                error = serializer.errors
+                return Response({"errors":error},status=status.HTTP_400_BAD_REQUEST)
+            context = {
+                "msg":"User already have active account",
+                "status":False
+                }
+            return Response (context,status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response({"msg":"Something went wrong"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get(self,request):
+        try :
+            user_profile = UserProfile.objects.filter(user=request.user_id).first()
+            if user_profile:
+                serializer = ProfileSerializer(user_profile,many=False)
+                context = {
+                    "msg":"Profile found",
+                    "data":serializer.data
+                }
+                return Response(context,status = status.HTTP_200_OK)
+            else:
+                return Response({"msg":"You don't have an profile. Please create a profile."},status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response({"msg":"Something went wrong"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def patch(self,request):
+        try :
+            user_profile = UserProfile.objects.filter(id=request.user_id)
+            if user_profile:
+                serializer = ProfileSerializer(user_profile,data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({"msg":"Profile has been updated."})
+                return Response({"errors":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+            return Response({"msg":"No profile found."},status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response({"msg":"Something went wrong"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class EditUserDetails(APIView):
+
+    """
+        This class is used to edit the details of the user model by the user.
+        AGE once set cannot be changed.
+
+    """
+
+    authentication_classes  = (JWTAuthentication,)
+    permission_classes      = (IsAuthenticated)
+
+    def get(self,request):
+        pass
+
+    def put(self,request):
+        pass
+
+    def patch(self,request):
+        pass
+
+class Resset_Password(APIView):
+
+    """
+        Class for resetting the passwords for the users.
+    """
+    def put(self,request,*args,**kwargs):
         pass

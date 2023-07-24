@@ -13,4 +13,12 @@ DISTRICT_CHOICES = (
           ("TV",'Thiruvanathapuram'),
           ("TS", 'Thirssur'),
           ("WA", 'Wayanad')
-        )                                # DISTRICT CHOICES FOR USERS >>>>>> AS OF NOW ONLY FOR KERALA.
+        )                           # DISTRICT CHOICES FOR USERS >>>>>> AS OF NOW ONLY FOR KERALA
+
+
+# game choices for user profiles 
+GAME_CHOICE      = {
+          ("ALL", "All Games"),
+          ("Cricket", "Cricket"),
+          ("Football","Football"),
+}                                    # MORE WILL BE ADDED LATER ON ....
