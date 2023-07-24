@@ -166,5 +166,8 @@ class Resset_Password(APIView):
     """
         Class for resetting the passwords for the users.
     """
+    authentication_classes  = (JWTAuthentication,)
+    permission_classes      = (IsAuthenticated,)
+    
     def put(self,request,*args,**kwargs):
         pass
