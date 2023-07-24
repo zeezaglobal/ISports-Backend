@@ -1,6 +1,6 @@
 # ISports-Backend
 
-Project setup.
+Project setup./n
 clone the repo 
 pip install virtualenv
 virtualenv *use env name*
