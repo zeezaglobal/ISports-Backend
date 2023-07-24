@@ -1,8 +1,12 @@
 # ISports-Backend
 
-Project setup./n
+Project setup.
+
+
 clone the repo 
+
 pip install virtualenv
+
 virtualenv *use env name*
 YOUR_ENV/scripts/activate
 cd backend
