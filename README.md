@@ -1,26 +1,42 @@
 # ISports-Backend
 
-Project setup.
+#### Teminal 1
 
+create virtualenv
 
-clone the repo 
+`pip install virtualenv`
 
-pip install virtualenv
+`virtualenv env`
 
-virtualenv *use env name*
+activate virtualenv 
 
-YOUR_ENV/scripts/activate
+`. .\env\Scripts\activate`
 
-cd backend
+NOTE - When ever we are using project activate the virtualenv
 
-pip install requirements.txt
+change directory 
 
-python manage.py makemigrations
+`cd backend`
 
-python manage.py migrate
+install all dependencies
 
-python manage.py createsuperuser( create a superuser to handle database)
+`pip install -r requirements.txt`
 
-To start the server : python manage.py runserver
+Make Migrations if Any
 
+`python manage.py makemigrations`
+
+`python manage.py migrate`
+
+Create Super User
+
+`python manage.py createsuperuser`
+
+Run Runsever
+
+`python manage.py runserver`
+
+Once work done - deactivate virtualenv. Again activate when working on project
+
+-----------------------------------------------------------------------
 
