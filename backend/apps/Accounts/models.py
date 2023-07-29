@@ -56,6 +56,11 @@ class Users(AbstractBaseUser,PermissionsMixin):
     updated_on      = models.DateTimeField(_('user updated on'), auto_now=True)
     date_of_birth   = models.DateField("Date in ( MM/DD/YYYY )",null= True,blank=False,auto_now=False,auto_now_add=False)
 
+    is_superuser    = models.BooleanField(default=False)
+    is_staff        = models.BooleanField(default=False)
+    is_active       = models.BooleanField(default=True)
+    is_admin        = models.BooleanField(default=False)
+
     objects = UserManager()
 
     USERNAME_FIELD      = 'email'

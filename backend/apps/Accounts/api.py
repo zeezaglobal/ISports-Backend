@@ -15,19 +15,25 @@ from .utils import create_jwt_token
 class UserResgistration(APIView):
 
     '''
-        This class is used for registerign new users . 
+        This class is used for registering new users . 
     '''
 
     permission_classes = []
 
     def post(self,request:Request):
-        user_data           = request.data
-        serializer          = RegistrationSerializer(data = user_data)
-        if serializer.is_valid():
-            serializer.save()
-            context = "Your account is created successfully, Please login to continue."
-            return Response(context,status=status.HTTP_201_CREATED)
-        return Response("Error in creating user account")
+        try:
+            user_data           = request.data
+            serializer          = RegistrationSerializer(data = user_data)
+            if serializer.is_valid():
+                serializer.save()
+                context = "Your account is created successfully, Please login to continue."
+                return Response({"msg":context},status=status.HTTP_201_CREATED)
+            else:
+                return Response({"error":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(f"this is the error : {e}")
+            return Response({"msg":"error occured"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
 class UserLogin(APIView):
 
@@ -38,24 +44,29 @@ class UserLogin(APIView):
     permission_classes = []
 
     def post(self,request:Request):
-        email       = request.data.get('email')
-        password    = request.data.get('password')
-        user        = authenticate(email=email,password=password)
+        try:
+            email       = request.data.get('email')
+            password    = request.data.get('password')
+            if not (email or password):
+                return Response({'msg':"email and password is must for login"},status=status.HTTP_400_BAD_REQUEST)
+            user        = authenticate(email=email,password=password)
+            
+            if user is not None:
+                token       = create_jwt_token(user=user)
+                context     =  ({
+                    "msg":"succesfull",
+                    "tokens":token
+                })
+                return Response(context,status=status.HTTP_200_OK)
+            else:
+                check_email = Users.objects.filter(email=email).first()
+                if not check_email:
+                    return Response({"msg":"user with given email is not found."},status=status.HTTP_400_BAD_REQUEST)
+                return Response({"msg":"password is incorrect"},status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"msg":"error occured"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        if user is not None:
-            token       = create_jwt_token(user=user)
-            context     =  ({
-                "msg":"succesfull",
-                "tokens":token
-            })
-            return Response(context,status=status.HTTP_200_OK)
-        else:
-            check_email = Users.objects.filter(email=email).first()
-            if not check_email:
-                return Response({"msg":"user with given email is not found."},status=status.HTTP_400_BAD_REQUEST)
-            return Response({"msg":"password is incorrect"},status=status.HTTP_400_BAD_REQUEST)
-
-
+            
 class UserLogout(APIView):
 
     '''
@@ -67,7 +78,7 @@ class UserLogout(APIView):
     authentication_classes = (JWTAuthentication,)
     permission_classes     = (IsAuthenticated,)
 
-    def post(self, request):
+    def post(self, request,*args, **kwargs):
         try:
             if self.request.data.get('all'):
                 token: OutstandingToken
@@ -75,10 +86,12 @@ class UserLogout(APIView):
                     _, _ = BlacklistedToken.objects.get_or_create(token=token)
                 return Response({"status": "all refresh tokens blacklisted"},status.HTTP_400_BAD_REQUEST)
             refresh_token = self.request.data.get('refresh')
+            if not refresh_token:
+                return Response({"msg": "refresh tokne is not found"},status=status.HTTP_400_BAD_REQUEST)
             token = RefreshToken(token=refresh_token)
             token.blacklist()
-            return Response({"msg": "Logged out "},status=status.HTTP_200_OK)
-        except:
+            return Response({"msg": "user logged out "},status=status.HTTP_200_OK)
+        except Exception as e:
             return Response({"msg":"Already logged out or Server Error"},status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -161,7 +174,7 @@ class EditUserDetails(APIView):
     def patch(self,request):
         pass
 
-class Resset_Password(APIView):
+class Reset_Password(APIView):
 
     """
         Class for resetting the passwords for the users.

@@ -1,0 +1,6 @@
+mainenv/
+db.sqlite3
+.env
+.DS_Store
+__pycache__
+migrtations/
