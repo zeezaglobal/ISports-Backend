@@ -107,6 +107,9 @@ class UserProfileViewSet(APIView):
     permission_classes      = (IsAuthenticated,)
 
     def post(self,request):
+        '''
+            Profile creation API
+        '''
         try:
             user = UserProfile.objects.filter(user=request.user_id,profile_active=False)
             if user:
@@ -124,8 +127,12 @@ class UserProfileViewSet(APIView):
             return Response (context,status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response({"msg":"Something went wrong"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
     def get(self,request):
+        '''
+            Profile View API
+        '''
         try :
             user_profile = UserProfile.objects.filter(user=request.user_id).first()
             if user_profile:
@@ -141,6 +148,9 @@ class UserProfileViewSet(APIView):
             return Response({"msg":"Something went wrong"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def patch(self,request):
+        '''
+            Profile Updating API
+        '''
         try :
             user_profile = UserProfile.objects.filter(id=request.user_id)
             if user_profile:

@@ -5,10 +5,24 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView
 )
 
+'''
+    HERE THIS CONTAINS ALL THE URLs REQUIRED FOR :
+            
+    [
+        Registrration
+        Login
+        Logout
+        Refresh Token
+        Profile Creation For Users
+        Updation of Profile
+        Resetting User password
+        Editng user account settings
+    ]
+        
+'''
 
 
 urlpatterns = [
-
 
     path('register/',UserResgistration.as_view(),name = "registration"),
     path('login/',UserLogin.as_view(),name='login'),
