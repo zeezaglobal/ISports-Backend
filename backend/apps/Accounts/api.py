@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate
 
 from .models import *
 from .serializer import *
-from .utils import create_jwt_token
+from .utils import create_jwt_token,is_valid_phone_number
 
 class UserResgistration(APIView):
 
@@ -22,14 +22,37 @@ class UserResgistration(APIView):
 
     def post(self,request:Request):
         try:
-            user_data           = request.data
-            serializer          = RegistrationSerializer(data = user_data)
-            if serializer.is_valid():
-                serializer.save()
-                context = "Your account is created successfully, Please login to continue."
-                return Response({"msg":context},status=status.HTTP_201_CREATED)
+            phone_number  = request.data.get("phone_number")
+            if phone_number:
+                valid = is_valid_phone_number(phone_number)
+                if valid:
+
+                    user_data           = request.data
+                    serializer          = RegistrationSerializer(data = user_data)
+                    
+                    if serializer.is_valid():
+                        serializer.save()
+                        context = "Your account is created successfully, Please login to continue."
+                        return Response(
+                            {
+                                "msg":context
+                                },
+                                status=status.HTTP_201_CREATED
+                            )
+                    else:
+                        return Response({"error":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {
+                        "msg":"invalid phone number"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             else:
-                return Response({"error":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+                return Response({
+                    "msg": "Phone number should be given"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+                )
         except Exception as e:
             print(f"this is the error : {e}")
             return Response({"msg":"error occured"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -45,11 +68,16 @@ class UserLogin(APIView):
 
     def post(self,request:Request):
         try:
-            email       = request.data.get('email')
-            password    = request.data.get('password')
-            if not (email or password):
-                return Response({'msg':"email and password is must for login"},status=status.HTTP_400_BAD_REQUEST)
-            user        = authenticate(email=email,password=password)
+            phone_number        = request.data.get('phone_number')
+            password            = request.data.get('password')
+            if not (phone_number or password):
+                return Response(
+                    {
+                        'msg':"phone number and password is must for login"
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            user        = authenticate(phone_number=phone_number,password=password)
             
             if user is not None:
                 token       = create_jwt_token(user=user)
@@ -59,9 +87,14 @@ class UserLogin(APIView):
                 })
                 return Response(context,status=status.HTTP_200_OK)
             else:
-                check_email = Users.objects.filter(email=email).first()
+                check_email = Users.objects.filter(phone_number=phone_number).first()
                 if not check_email:
-                    return Response({"msg":"user with given email is not found."},status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {
+                            "msg":"user with given email is not found."
+                            },
+                            status=status.HTTP_400_BAD_REQUEST
+                            )
                 return Response({"msg":"password is incorrect"},status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"msg":"error occured"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
