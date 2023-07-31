@@ -5,47 +5,60 @@ from datetime import date
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from .constants import DISTRICT_CHOICES,GAME_CHOICE
+from .utils import is_valid_phone_number
+
 
 class UserManager(BaseUserManager):
     
     use_in_migrations = True
     
-    def create_user(self,email,username,password):
+    def create_user(self,phone_number,password):
+
+        valid_status = is_valid_phone_number(phone_number)
         
-        if not email:
-            raise ValueError("Users must have an valid email address.")
-        if not username :
-            raise ValueError("User must have unique username.")
-        
-        user = self.model(
-            email = self.normalize_email(email),
-            username = username,
-        )
-        user.set_password(password)
-        user.save()
-        return user 
+        if valid_status:
+            if not phone_number:
+                raise ValueError("User requires a phone number to create an account.")
+            # if not username :
+            #     raise ValueError("User must have unique username.")
+            
+            user = self.model(
+                phone_number = phone_number,
+            )
+            user.set_password(password)
+            user.save()
+            return user
+        else:
+            raise ValueError("Invalid Number!!!")
     
 
-    def create_superuser(self,email,username,password):
-        user    =  self.create_user(
-                                    email = self.normalize_email(email),
-                                    username = username,
-                                    password = password,
-                            )
-        
-        user.is_admin       = True
-        user.is_staff       = True
-        user.is_superuser   = True
-        user.save()
-        return user
+    def create_superuser(self,phone_number,password):
+
+        valid_status = is_valid_phone_number(phone_number=phone_number)
+        if valid_status:
+            user    =  self.create_user(
+                                        phone_number = phone_number,
+                                        password = password,
+                                )
+            
+            user.is_admin       = True
+            user.is_staff       = True
+            user.is_superuser   = True
+            user.save()
+            return user
+        else:
+            raise ValueError("Invalid Number!!!")
+
+    
+
     
 class Users(AbstractBaseUser,PermissionsMixin):
 
-    email           = models.EmailField(_('email'), unique = True)
+    email           = models.EmailField(_('email'), unique = True, blank= True, null=True)
     first_name      = models.CharField(_('first_name'), max_length = 100, blank = True)
     last_name       = models.CharField(_('last_name'), max_length = 100, blank = True)
-    username        = models.CharField(_('nickname'), max_length = 100, unique= True)
-    phone_number    = models.CharField(max_length=30, blank=True, null=True)
+    username        = models.CharField(_('nickname'), max_length = 100, unique= True,null=True,blank=True)
+    phone_number    = models.CharField(max_length=30, blank=True, null=True,unique=True)
     address         = models.CharField(_('user address'), max_length=500, blank=True)
     city            = models.CharField(_('user city'), max_length=250, blank=True)
     state           = models.CharField(_('user state'), max_length=250, blank=True)
@@ -63,8 +76,8 @@ class Users(AbstractBaseUser,PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD      = 'email'
-    REQUIRED_FIELDS     = ['username']
+    USERNAME_FIELD      = 'phone_number'
+    # REQUIRED_FIELDS     = ['username']
     
     def has_perm(self,perm,obj = None):
         return self.is_admin
