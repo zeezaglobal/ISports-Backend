@@ -52,13 +52,16 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
+
+    #AMAZON S3 STORAGES
+    'storages',
     
 
     # APPS
     'apps.Accounts'
 ]
 
-
+# AWS_S3_FILE_OVERWRITE = False
 
 
 MIDDLEWARE = [

@@ -30,6 +30,4 @@ urlpatterns = [
     path('logout/',UserLogout.as_view(),name='logout'),
     path('profile/',UserProfileViewSet.as_view(),name="user_profile"),
     
-
-
 ]
