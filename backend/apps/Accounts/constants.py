@@ -22,3 +22,6 @@ GAME_CHOICE      = {
           ("Cricket", "Cricket"),
           ("Football","Football"),
 }                                    # MORE WILL BE ADDED LATER ON ....
+
+
+DEFAULT_EXCEPTION_MSG = "something went wrong in accounts!"
