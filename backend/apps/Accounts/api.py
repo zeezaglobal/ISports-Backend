@@ -266,14 +266,19 @@ class EditUserDetails(APIView):
     """
         This class is used to edit the details of the user model by the user.
         AGE once set cannot be changed.
-
     """
 
     authentication_classes  = (JWTAuthentication,)
     permission_classes      = (IsAuthenticated)
 
     def get(self,request):
-        pass
+        try:
+            pass
+        except:
+            return Response(
+                {"msg":DEFAULT_EXCEPTION_MSG},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     def put(self,request):
         pass
