@@ -11,7 +11,6 @@ from django.contrib.auth import authenticate
 from .models import *
 from .serializer import *
 from .utils import create_jwt_token,is_valid_phone_number
-from .constants import DEFAULT_EXCEPTION_MSG
 
 class UserResgistration(APIView):
 
@@ -43,7 +42,7 @@ class UserResgistration(APIView):
                     else:
                         return Response({"error":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
                 return Response(
-                        {
+                    {
                         "msg":"invalid phone number"
                     },
                     status=status.HTTP_400_BAD_REQUEST
@@ -52,16 +51,11 @@ class UserResgistration(APIView):
                 return Response({
                     "msg": "Phone number should be given"
                 },
-                    status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST
                 )
         except Exception as e:
             print(f"this is the error : {e}")
-            return Response(
-                {
-                    "msg":DEFAULT_EXCEPTION_MSG
-                    },
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+            return Response({"msg":"error occured"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
 class UserLogin(APIView):
@@ -87,12 +81,10 @@ class UserLogin(APIView):
             
             if user is not None:
                 token       = create_jwt_token(user=user)
-                context     =  (
-                    {
-                        "msg":"succesfull",
-                        "tokens":token
-                    }
-                )
+                context     =  ({
+                    "msg":"succesfull",
+                    "tokens":token
+                })
                 return Response(context,status=status.HTTP_200_OK)
             else:
                 check_email = Users.objects.filter(phone_number=phone_number).first()
@@ -102,20 +94,10 @@ class UserLogin(APIView):
                             "msg":"user with given email is not found."
                             },
                             status=status.HTTP_400_BAD_REQUEST
-                        )
-                return Response(
-                    {
-                        "msg":"password is incorrect"
-                        },
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
+                            )
+                return Response({"msg":"password is incorrect"},status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return Response(
-                {
-                    "msg":DEFAULT_EXCEPTION_MSG
-                    },
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+            return Response({"msg":"error occured"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
             
 class UserLogout(APIView):
@@ -135,35 +117,15 @@ class UserLogout(APIView):
                 token: OutstandingToken
                 for token in OutstandingToken.objects.filter(user=request.user):
                     _, _ = BlacklistedToken.objects.get_or_create(token=token)
-                return Response(
-                    {
-                        "status": "all refresh tokens blacklisted"
-                        },
-                        status.HTTP_400_BAD_REQUEST
-                    )
+                return Response({"status": "all refresh tokens blacklisted"},status.HTTP_400_BAD_REQUEST)
             refresh_token = self.request.data.get('refresh')
             if not refresh_token:
-                return Response(
-                    {
-                        "msg": "refresh tokne is not found"
-                        },
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
+                return Response({"msg": "refresh tokne is not found"},status=status.HTTP_400_BAD_REQUEST)
             token = RefreshToken(token=refresh_token)
             token.blacklist()
-            return Response(
-                {
-                    "msg": "user logged out "
-                    },
-                    status=status.HTTP_200_OK
-                    )
+            return Response({"msg": "user logged out "},status=status.HTTP_200_OK)
         except Exception as e:
-            return Response(
-                {
-                    "msg":DEFAULT_EXCEPTION_MSG
-                    },
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                    )
+            return Response({"msg":"Already logged out or Server Error"},status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserProfileViewSet(APIView):
@@ -188,32 +150,16 @@ class UserProfileViewSet(APIView):
                 serializer = ProfileSerializer(data = profile_data)
                 if serializer.is_valid():
                     serializer.save()
-                    return Response(
-                        {
-                            "msg": "Profile Created"
-                            },
-                            status=status.HTTP_200_OK
-                        )
+                    return Response({"msg": "Profile Created"},status=status.HTTP_200_OK)
                 error = serializer.errors
-                return Response(
-                    {
-                        "errors":error
-                        },
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
+                return Response({"errors":error},status=status.HTTP_400_BAD_REQUEST)
             context = {
                 "msg":"User already have active account",
                 "status":False
                 }
-            return Response (context,
-                             status=status.HTTP_400_BAD_REQUEST)
+            return Response (context,status=status.HTTP_400_BAD_REQUEST)
         except:
-            return Response(
-                {
-                    "msg":DEFAULT_EXCEPTION_MSG
-                    },
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+            return Response({"msg":"Something went wrong"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
     def get(self,request):
@@ -230,19 +176,9 @@ class UserProfileViewSet(APIView):
                 }
                 return Response(context,status = status.HTTP_200_OK)
             else:
-                return Response(
-                    {
-                        "msg":"You don't have an profile. Please create a profile."
-                        },
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
+                return Response({"msg":"You don't have an profile. Please create a profile."},status=status.HTTP_400_BAD_REQUEST)
         except:
-            return Response(
-                {
-                    "msg":DEFAULT_EXCEPTION_MSG
-                    },
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+            return Response({"msg":"Something went wrong"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def patch(self,request):
         '''
@@ -255,24 +191,10 @@ class UserProfileViewSet(APIView):
                 if serializer.is_valid():
                     serializer.save()
                     return Response({"msg":"Profile has been updated."})
-                return Response(
-                    {
-                        "errors":serializer.errors
-                        },
-                    status=status.HTTP_400_BAD_REQUEST
-                    )
-            return Response(
-                {
-                    "msg":"No profile found."
-                 },
-                 status=status.HTTP_400_BAD_REQUEST)
+                return Response({"errors":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+            return Response({"msg":"No profile found."},status=status.HTTP_400_BAD_REQUEST)
         except:
-            return Response(
-                {
-                    "msg":DEFAULT_EXCEPTION_MSG
-                    },
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+            return Response({"msg":"Something went wrong"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class EditUserDetails(APIView):
