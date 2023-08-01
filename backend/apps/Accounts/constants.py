@@ -1,8 +1,3 @@
-'''
-  DISTRICT CHOICES AVAILABLE FOR USERS
-'''
-
- # DISTRICT CHOICES FOR USERS >>>>>> AS OF NOW ONLY FOR KERALA
 DISTRICT_CHOICES = (
           ("AL", 'Alappuzha'),
           ("ER", 'Ernakulam'),
@@ -18,7 +13,7 @@ DISTRICT_CHOICES = (
           ("TV",'Thiruvanathapuram'),
           ("TS", 'Thirssur'),
           ("WA", 'Wayanad')
-        )                         
+        )                           # DISTRICT CHOICES FOR USERS >>>>>> AS OF NOW ONLY FOR KERALA
 
 
 # game choices for user profiles 
@@ -27,7 +22,3 @@ GAME_CHOICE      = {
           ("Cricket", "Cricket"),
           ("Football","Football"),
 }                                    # MORE WILL BE ADDED LATER ON ....
-
-
-
-DEFAULT_EXCEPTION_MSG = "Something went wrong in accounts" # this is the default error message in Accounts

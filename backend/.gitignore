@@ -32,6 +32,3 @@ __pycache__/
 # Ignore IDE-specific directories (you can add more if needed)
 .vscode/
 .idea/
-migrations/
-media
-static
