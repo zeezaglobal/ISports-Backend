@@ -1,34 +1,38 @@
-# Django project .gitignore
-
-# Ignore migration files
-**/migrations/
+# Ignore database files
+*.db
+*.sqlite3
 
 # Ignore Python compiled files
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-# Ignore other commonly ignored files and directories
-*.pyc
-*.pyo
-*.pyd
-*.swp
-*.swo
-*.class
-*.cache
-*.egg-info/
-*.egg
-*.db
-*.sqlite3
-*.pyc
-*.pyo
-*.pyd
-*.pyc
-*.pyo
-*.pyd
-*.env
-
-# Ignore development settings
+# Ignore local development settings
 **/settings/local.py
 
 # Ignore IDE-specific directories (you can add more if needed)
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# Ignore other commonly ignored files and directories
+*.class
+*.cache
+*.egg-info/
+*.egg
+*.env
+*.log
+*.tmp
+*.bak
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore migration files, except __init__.py inside migrations folders
+**/migrations/*
+!**/migrations/__init__.py
