@@ -95,7 +95,7 @@ class UserLogin(APIView):
                 check_email = Users.objects.filter(phone_number=phone_number).first()
                 if not check_email:
                     return Response(
-                        {"msg":"user with given email is not found."},
+                        {"msg":"invalid phone number"},
                             status=status.HTTP_400_BAD_REQUEST
                         )
                 return Response(
@@ -124,24 +124,35 @@ class UserLogout(APIView):
     def post(self, request,*args, **kwargs):
 
         try:
-
             if self.request.data.get('all'):
                 token: OutstandingToken
 
                 for token in OutstandingToken.objects.filter(user=request.user):
                     _, _ = BlacklistedToken.objects.get_or_create(token=token)
-                return Response({"status": "all refresh tokens blacklisted"},status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"status": "all refresh tokens blacklisted"},
+                    status.HTTP_400_BAD_REQUEST
+                    )
             refresh_token = self.request.data.get('refresh')
 
             if not refresh_token:
-                return Response({"msg": "refresh tokne is not found"},status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"msg": "refresh tokne is not found"},
+                    status=status.HTTP_400_BAD_REQUEST
+                    )
             
             token = RefreshToken(token=refresh_token)
             token.blacklist()
-            return Response({"msg": "user logged out "},status=status.HTTP_200_OK)
+            return Response(
+                {"msg": "user logged out "},
+                status=status.HTTP_200_OK
+                )
         
         except Exception as e:
-            return Response({"msg":DEFAULT_EXCEPTION_MSG},status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"msg":DEFAULT_EXCEPTION_MSG},
+                status=status.HTTP_400_BAD_REQUEST
+                )
 
 
 class UserProfileViewSet(APIView):
@@ -168,10 +179,16 @@ class UserProfileViewSet(APIView):
 
                 if serializer.is_valid():
                     serializer.save()
-                    return Response({"msg": "Profile Created"},status=status.HTTP_200_OK)
+                    return Response(
+                        {"msg": "Profile Created"},
+                        status=status.HTTP_200_OK
+                        )
                 
                 error = serializer.errors
-                return Response({"errors":error},status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"errors":error},
+                    status=status.HTTP_400_BAD_REQUEST
+                    )
             context = {
                 "msg":"User already have active account",
                 "status":False
